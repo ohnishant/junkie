@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "monkey-interpreter"
+name = "junkie"
 version = "0.1.0"
