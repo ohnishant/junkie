@@ -28,7 +28,7 @@ pub struct Token {
 }
 
 impl Token {
-    pub fn new_token(token_type: TokenType, ch: char) -> Token {
+    pub fn new_token(token_type: TokenType, ch: String) -> Token {
         return Token {
             kind: token_type,
             literal: ch.to_string(),

@@ -50,8 +50,16 @@ impl Lexer {
 
         if let Some(ch) = self.current_char {
             match ch {
-                '=' => tok = Token::new_token(TokenType::ASSIGN, ch),
-                _ => tok = Token::new_token(TokenType::ILLEGAL, ch),
+                '=' => tok = Token::new_token(TokenType::ASSIGN, ch.to_string()),
+                ';' => tok = Token::new_token(TokenType::SEMICOLON, ch.to_string()),
+                '(' => tok = Token::new_token(TokenType::LPAREN, ch.to_string()),
+                ')' => tok = Token::new_token(TokenType::RPAREN, ch.to_string()),
+                ',' => tok = Token::new_token(TokenType::COMMA, ch.to_string()),
+                '+' => tok = Token::new_token(TokenType::PLUS, ch.to_string()),
+                '{' => tok = Token::new_token(TokenType::LBRACE, ch.to_string()),
+                '}' => tok = Token::new_token(TokenType::RBRACE, ch.to_string()),
+                '\0' => tok = Token::new_token(TokenType::EOF,"".to_string()),
+                _ => tok = Token::new_token(TokenType::ILLEGAL, ch.to_string()),
             }
         }
     }
