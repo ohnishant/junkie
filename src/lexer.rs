@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::token::Token;
 use crate::token::TokenType;
 
@@ -45,10 +47,10 @@ impl Lexer {
         self.input.chars().nth(self.position + 1)
     }
     
-    pub fn next_token(self) {
+    pub fn next_token(&mut self) -> Token {
         let tok: Token;
 
-        if let Some(ch) = self.current_char {
+        if let Some(ch) = self.get_current_char() {
             match ch {
                 '=' => tok = Token::new_token(TokenType::ASSIGN, ch.to_string()),
                 ';' => tok = Token::new_token(TokenType::SEMICOLON, ch.to_string()),
@@ -58,9 +60,36 @@ impl Lexer {
                 '+' => tok = Token::new_token(TokenType::PLUS, ch.to_string()),
                 '{' => tok = Token::new_token(TokenType::LBRACE, ch.to_string()),
                 '}' => tok = Token::new_token(TokenType::RBRACE, ch.to_string()),
-                '\0' => tok = Token::new_token(TokenType::EOF,"".to_string()),
+                // '\0' => tok = Token::new_token(TokenType::EOF,"".to_string()),
                 _ => tok = Token::new_token(TokenType::ILLEGAL, ch.to_string()),
             }
         }
+        else {
+            tok = Token::new_token(TokenType::EOF, "".to_string());
+        }
+        self.advance();
+        return tok;
+    }
+}
+
+#[test]
+fn test_next_token() {
+    let input = "=+(){}";
+    let mut lexer = Lexer::new(input.to_string());
+    
+    let tests = [
+        Token::new_token(TokenType::ASSIGN, "=".to_string()),
+        Token::new_token(TokenType::PLUS, "+".to_string()),
+        Token::new_token(TokenType::LPAREN, "(".to_string()),
+        Token::new_token(TokenType::RPAREN, ")".to_string()),
+        Token::new_token(TokenType::LBRACE, "{".to_string()),
+        Token::new_token(TokenType::RBRACE, "}".to_string()),
+        Token::new_token(TokenType::EOF, "".to_string()),
+    ];
+
+    for tt in tests.iter() {
+        let tok = lexer.next_token();
+        assert_eq!(tok.kind, tt.kind);
+        assert_eq!(tok.literal, tt.literal);
     }
 }
