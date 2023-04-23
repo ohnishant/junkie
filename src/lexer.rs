@@ -74,12 +74,14 @@ impl Lexer {
 
 #[test]
 fn test_next_token() {
-    let input = "=+(){}";
+    let input = "=+aa(){}";
     let mut lexer = Lexer::new(input.to_string());
     
     let tests = [
         Token::new_token(TokenType::ASSIGN, "=".to_string()),
         Token::new_token(TokenType::PLUS, "+".to_string()),
+        Token::new_token(TokenType::ILLEGAL, "a".to_string()),
+        Token::new_token(TokenType::ILLEGAL, "a".to_string()),
         Token::new_token(TokenType::LPAREN, "(".to_string()),
         Token::new_token(TokenType::RPAREN, ")".to_string()),
         Token::new_token(TokenType::LBRACE, "{".to_string()),
