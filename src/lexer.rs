@@ -74,19 +74,61 @@ impl Lexer {
 
 #[test]
 fn test_next_token() {
-    let input = "=+aa(){}";
+    let input = "let five = 5;
+    let ten = 10;
+
+    let add = fn(x, y) {
+        x + y;
+    }
+    let result = add(five, ten);
+    ";
+
     let mut lexer = Lexer::new(input.to_string());
     
     let tests = [
+        Token::new_token(TokenType::LET, "let".to_string()),
+        Token::new_token(TokenType::IDENT("five".to_string()), "five".to_string()),
         Token::new_token(TokenType::ASSIGN, "=".to_string()),
-        Token::new_token(TokenType::PLUS, "+".to_string()),
-        Token::new_token(TokenType::ILLEGAL, "a".to_string()),
-        Token::new_token(TokenType::ILLEGAL, "a".to_string()),
+        Token::new_token(TokenType::INT(5), "5".to_string()),
         Token::new_token(TokenType::LPAREN, "(".to_string()),
+        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+        
+        Token::new_token(TokenType::LET, "let".to_string()),
+        Token::new_token(TokenType::IDENT("ten".to_string()), "ten".to_string()),
+        Token::new_token(TokenType::ASSIGN, "=".to_string()),
+        Token::new_token(TokenType::INT(10), "10".to_string()),
+        Token::new_token(TokenType::LPAREN, "(".to_string()),
+        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+
+        Token::new_token(TokenType::LET, "let".to_string()),
+        Token::new_token(TokenType::IDENT("add".to_string()), "add".to_string()),
+        Token::new_token(TokenType::ASSIGN, "=".to_string()),
+        Token::new_token(TokenType::FUNCTION, "fn".to_string()),
+        Token::new_token(TokenType::LPAREN, "(".to_string()),
+        Token::new_token(TokenType::IDENT("x".to_string()), "x".to_string()),
+        Token::new_token(TokenType::COMMA, ",".to_string()),
+        Token::new_token(TokenType::IDENT("y".to_string()), "y".to_string()),
         Token::new_token(TokenType::RPAREN, ")".to_string()),
         Token::new_token(TokenType::LBRACE, "{".to_string()),
+        Token::new_token(TokenType::IDENT("x".to_string()), "x".to_string()),
+        Token::new_token(TokenType::PLUS, "+".to_string()),
+        Token::new_token(TokenType::IDENT("y".to_string()), "y".to_string()),
         Token::new_token(TokenType::RBRACE, "}".to_string()),
+
+        
+        Token::new_token(TokenType::LET, "let".to_string()),
+        Token::new_token(TokenType::IDENT("result".to_string()), "result".to_string()),
+        Token::new_token(TokenType::ASSIGN, "=".to_string()),
+        Token::new_token(TokenType::IDENT("add".to_string()), "add".to_string()),
+        Token::new_token(TokenType::LPAREN, "(".to_string()),
+        Token::new_token(TokenType::IDENT("five".to_string()), "five".to_string()),
+        Token::new_token(TokenType::COMMA, ",".to_string()),
+        Token::new_token(TokenType::IDENT("ten".to_string()), "ten".to_string()),
+        Token::new_token(TokenType::RPAREN, ")".to_string()),
+        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+
         Token::new_token(TokenType::EOF, "".to_string()),
+
     ];
 
     for tt in tests.iter() {
@@ -95,3 +137,28 @@ fn test_next_token() {
         assert_eq!(tok.literal, tt.literal);
     }
 }
+
+
+// #[test]
+// fn test_next_token() {
+//     let input = "=+aa(){}";
+//     let mut lexer = Lexer::new(input.to_string());
+    
+//     let tests = [
+//         Token::new_token(TokenType::ASSIGN, "=".to_string()),
+//         Token::new_token(TokenType::PLUS, "+".to_string()),
+//         Token::new_token(TokenType::ILLEGAL, "a".to_string()),
+//         Token::new_token(TokenType::ILLEGAL, "a".to_string()),
+//         Token::new_token(TokenType::LPAREN, "(".to_string()),
+//         Token::new_token(TokenType::RPAREN, ")".to_string()),
+//         Token::new_token(TokenType::LBRACE, "{".to_string()),
+//         Token::new_token(TokenType::RBRACE, "}".to_string()),
+//         Token::new_token(TokenType::EOF, "".to_string()),
+//     ];
+
+//     for tt in tests.iter() {
+//         let tok = lexer.next_token();
+//         assert_eq!(tok.kind, tt.kind);
+//         assert_eq!(tok.literal, tt.literal);
+//     }
+// }
