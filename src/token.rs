@@ -8,6 +8,13 @@ pub enum TokenType {
 
     PLUS,
     ASSIGN,
+    MINUS,
+    BANG,
+    ASTERISK,
+    SLASH,
+
+    LESSTHAN,
+    GREATERTHAN,
 
     COMMA,
     SEMICOLON,

@@ -119,6 +119,30 @@ impl Lexer {
                     tok_type = TokenType::RBRACE;
                     tok_literal = ch.to_string();
                 }
+                '-' => {
+                    tok_type = TokenType::MINUS;
+                    tok_literal = ch.to_string();
+                }
+                '!' => {
+                    tok_type = TokenType::BANG;
+                    tok_literal = ch.to_string();
+                }
+                '/' => {
+                    tok_type = TokenType::SLASH;
+                    tok_literal = ch.to_string();
+                }
+                '*' => {
+                    tok_type = TokenType::ASTERISK;
+                    tok_literal = ch.to_string();
+                }
+                '>' => {
+                    tok_type = TokenType::GREATERTHAN;
+                    tok_literal = ch.to_string();
+                }
+                '<' => {
+                    tok_type = TokenType::LESSTHAN;
+                    tok_literal = ch.to_string();
+                }
                 // '\0' => {
                 //     tok_type = TokenType::EOF;
                 //     tok_literal = "".to_string();
@@ -167,6 +191,8 @@ fn test_next_token_second() {
     }
 
     let result = add(five, ten);
+    !-/*5;
+    5 < 10 > 5;
     ";
 
     let mut lexer = Lexer::new(input.to_string());
@@ -206,6 +232,18 @@ fn test_next_token_second() {
         Token::new_token(TokenType::COMMA, ",".to_string()),
         Token::new_token(TokenType::IDENT("ten".to_string()), "ten".to_string()),
         Token::new_token(TokenType::RPAREN, ")".to_string()),
+        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+        Token::new_token(TokenType::BANG, "!".to_string()),
+        Token::new_token(TokenType::MINUS, "-".to_string()),
+        Token::new_token(TokenType::SLASH, "/".to_string()),
+        Token::new_token(TokenType::ASTERISK, "*".to_string()),
+        Token::new_token(TokenType::INT(5), "5".to_string()),
+        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+        Token::new_token(TokenType::INT(5), "5".to_string()),
+        Token::new_token(TokenType::LESSTHAN, "<".to_string()),
+        Token::new_token(TokenType::INT(10), "10".to_string()),
+        Token::new_token(TokenType::GREATERTHAN, ">".to_string()),
+        Token::new_token(TokenType::INT(5), "5".to_string()),
         Token::new_token(TokenType::SEMICOLON, ";".to_string()),
         Token::new_token(TokenType::EOF, "".to_string()),
     ];
