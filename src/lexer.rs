@@ -1,6 +1,5 @@
 #![allow(dead_code)]
 
-use crate::token;
 use crate::token::Token;
 use crate::token::TokenType;
 use crate::utils::{is_digit, is_letter};
@@ -37,7 +36,7 @@ impl Lexer {
     }
 
     fn is_whitespace(&self, ch: char) -> bool {
-        return ch.is_whitespace() || ch == '\n' || ch == '\r';
+        return ch.is_whitespace();
     }
 
     fn skip_whitespace(&mut self) {
@@ -80,14 +79,6 @@ impl Lexer {
         }
         self.retreat();
         return number;
-    }
-
-    fn lookup_ident(&mut self, tok: &mut token::Token) -> token::TokenType {
-        match tok.literal.as_str() {
-            "fn" => return TokenType::FUNCTION,
-            "let" => return TokenType::LET,
-            _ => return TokenType::IDENT("thing".to_string()),
-        }
     }
 
     pub fn next_token(&mut self) -> Token {
@@ -174,6 +165,7 @@ fn test_next_token_second() {
     let add = fn(x, y) {
         x + y;
     }
+
     let result = add(five, ten);
     ";
 
