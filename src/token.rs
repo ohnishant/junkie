@@ -16,6 +16,9 @@ pub enum TokenType {
     LESSTHAN,
     GREATERTHAN,
 
+    EQUAL,
+    NOTEQUAL,
+
     COMMA,
     SEMICOLON,
 
@@ -26,6 +29,11 @@ pub enum TokenType {
 
     FUNCTION,
     LET,
+    TRUE,
+    FALSE,
+    IF,
+    ELSE,
+    RETURN,
 }
 
 #[derive(Debug)]

@@ -88,8 +88,19 @@ impl Lexer {
         if let Some(ch) = self.get_current_char() {
             match ch {
                 '=' => {
-                    tok_type = TokenType::ASSIGN;
-                    tok_literal = ch.to_string();
+                    match self.peek() {
+                        Some('=') => {
+                            tok_type = TokenType::EQUAL;
+                            tok_literal = "==".to_string();
+                            self.advance();
+                        }
+                        _ => {
+                            tok_type = TokenType::ASSIGN;
+                            tok_literal = "=".to_string();
+                        }
+                    }
+                    // tok_type = TokenType::ASSIGN;
+                    // tok_literal = ch.to_string();
                 }
                 ';' => {
                     tok_type = TokenType::SEMICOLON;
@@ -123,10 +134,17 @@ impl Lexer {
                     tok_type = TokenType::MINUS;
                     tok_literal = ch.to_string();
                 }
-                '!' => {
-                    tok_type = TokenType::BANG;
-                    tok_literal = ch.to_string();
-                }
+                '!' => match self.peek() {
+                    Some('=') => {
+                        tok_type = TokenType::NOTEQUAL;
+                        tok_literal = "!=".to_string();
+                        self.advance();
+                    }
+                    _ => {
+                        tok_type = TokenType::BANG;
+                        tok_literal = "!".to_string();
+                    }
+                },
                 '/' => {
                     tok_type = TokenType::SLASH;
                     tok_literal = ch.to_string();
@@ -153,6 +171,11 @@ impl Lexer {
                         tok_type = match tok_literal.as_str() {
                             "let" => TokenType::LET,
                             "fn" => TokenType::FUNCTION,
+                            "true" => TokenType::TRUE,
+                            "false" => TokenType::FALSE,
+                            "if" => TokenType::IF,
+                            "else" => TokenType::ELSE,
+                            "return" => TokenType::RETURN,
                             _ => TokenType::IDENT(tok_literal.clone()),
                         }
                     } else if is_digit(ch) {
@@ -193,6 +216,15 @@ fn test_next_token_second() {
     let result = add(five, ten);
     !-/*5;
     5 < 10 > 5;
+
+    if (5 < 10) {
+        return true;
+        } else {
+        return false;
+        }
+
+    10 == 10;
+    10 != 9;
     ";
 
     let mut lexer = Lexer::new(input.to_string());
@@ -244,6 +276,31 @@ fn test_next_token_second() {
         Token::new_token(TokenType::INT(10), "10".to_string()),
         Token::new_token(TokenType::GREATERTHAN, ">".to_string()),
         Token::new_token(TokenType::INT(5), "5".to_string()),
+        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+        Token::new_token(TokenType::IF, "if".to_string()),
+        Token::new_token(TokenType::LPAREN, "(".to_string()),
+        Token::new_token(TokenType::INT(5), "5".to_string()),
+        Token::new_token(TokenType::LESSTHAN, "<".to_string()),
+        Token::new_token(TokenType::INT(10), "10".to_string()),
+        Token::new_token(TokenType::RPAREN, ")".to_string()),
+        Token::new_token(TokenType::LBRACE, "{".to_string()),
+        Token::new_token(TokenType::RETURN, "return".to_string()),
+        Token::new_token(TokenType::TRUE, "true".to_string()),
+        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+        Token::new_token(TokenType::RBRACE, "}".to_string()),
+        Token::new_token(TokenType::ELSE, "else".to_string()),
+        Token::new_token(TokenType::LBRACE, "{".to_string()),
+        Token::new_token(TokenType::RETURN, "return".to_string()),
+        Token::new_token(TokenType::FALSE, "false".to_string()),
+        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+        Token::new_token(TokenType::RBRACE, "}".to_string()),
+        Token::new_token(TokenType::INT(10), "10".to_string()),
+        Token::new_token(TokenType::EQUAL, "==".to_string()),
+        Token::new_token(TokenType::INT(10), "10".to_string()),
+        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+        Token::new_token(TokenType::INT(10), "10".to_string()),
+        Token::new_token(TokenType::NOTEQUAL, "!=".to_string()),
+        Token::new_token(TokenType::INT(9), "9".to_string()),
         Token::new_token(TokenType::SEMICOLON, ";".to_string()),
         Token::new_token(TokenType::EOF, "".to_string()),
     ];
