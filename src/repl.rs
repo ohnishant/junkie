@@ -1,12 +1,13 @@
-use std::io;
+use std::io::{self, stdout, Write};
 
 use crate::lexer::Lexer;
 use crate::token::TokenType;
 
 pub fn start() {
     loop {
+        let mut input: String = String::new();
         print!(">> ");
-        let mut input = String::new();
+        stdout().flush().expect("Error flushing stdout.");
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read line");
@@ -19,8 +20,9 @@ pub fn start() {
         let mut token = lexer.next_token();
 
         while token.kind != TokenType::EOF {
-            println!("{:?}", token);
+            println!("Type: {:?}  Literal: {}", token.kind, token.literal);
             token = lexer.next_token();
         }
+        print!("\n\n")
     }
 }

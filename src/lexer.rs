@@ -195,7 +195,7 @@ impl Lexer {
         self.advance();
         self.skip_whitespace();
 
-        println!("{}", tok_literal);
+        // println!("{}", tok_literal);
 
         return Token {
             kind: tok_type,
