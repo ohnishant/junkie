@@ -1,7 +1,9 @@
 mod lexer;
 mod repl;
-pub mod token;
 mod utils;
+
+pub mod ast;
+pub mod token;
 
 use repl::start;
 
