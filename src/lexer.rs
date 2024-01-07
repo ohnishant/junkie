@@ -204,9 +204,14 @@ impl Lexer {
     }
 }
 
-#[test]
-fn test_next_token_second() {
-    let input = "let five = 5;
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn test_next_token_second() {
+        let input = "let five = 5;
     let ten = 10;
 
     let add = fn(x, y) {
@@ -227,114 +232,115 @@ fn test_next_token_second() {
     10 != 9;
     ";
 
-    let mut lexer = Lexer::new(input.to_string());
+        let mut lexer = Lexer::new(input.to_string());
 
-    let tests = [
-        Token::new_token(TokenType::LET, "let".to_string()),
-        Token::new_token(TokenType::IDENT("five".to_string()), "five".to_string()),
-        Token::new_token(TokenType::ASSIGN, "=".to_string()),
-        Token::new_token(TokenType::INT(5), "5".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::LET, "let".to_string()),
-        Token::new_token(TokenType::IDENT("ten".to_string()), "ten".to_string()),
-        Token::new_token(TokenType::ASSIGN, "=".to_string()),
-        Token::new_token(TokenType::INT(10), "10".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::LET, "let".to_string()),
-        Token::new_token(TokenType::IDENT("add".to_string()), "add".to_string()),
-        Token::new_token(TokenType::ASSIGN, "=".to_string()),
-        Token::new_token(TokenType::FUNCTION, "fn".to_string()),
-        Token::new_token(TokenType::LPAREN, "(".to_string()),
-        Token::new_token(TokenType::IDENT("x".to_string()), "x".to_string()),
-        Token::new_token(TokenType::COMMA, ",".to_string()),
-        Token::new_token(TokenType::IDENT("y".to_string()), "y".to_string()),
-        Token::new_token(TokenType::RPAREN, ")".to_string()),
-        Token::new_token(TokenType::LBRACE, "{".to_string()),
-        Token::new_token(TokenType::IDENT("x".to_string()), "x".to_string()),
-        Token::new_token(TokenType::PLUS, "+".to_string()),
-        Token::new_token(TokenType::IDENT("y".to_string()), "y".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::RBRACE, "}".to_string()),
-        Token::new_token(TokenType::LET, "let".to_string()),
-        Token::new_token(TokenType::IDENT("result".to_string()), "result".to_string()),
-        Token::new_token(TokenType::ASSIGN, "=".to_string()),
-        Token::new_token(TokenType::IDENT("add".to_string()), "add".to_string()),
-        Token::new_token(TokenType::LPAREN, "(".to_string()),
-        Token::new_token(TokenType::IDENT("five".to_string()), "five".to_string()),
-        Token::new_token(TokenType::COMMA, ",".to_string()),
-        Token::new_token(TokenType::IDENT("ten".to_string()), "ten".to_string()),
-        Token::new_token(TokenType::RPAREN, ")".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::BANG, "!".to_string()),
-        Token::new_token(TokenType::MINUS, "-".to_string()),
-        Token::new_token(TokenType::SLASH, "/".to_string()),
-        Token::new_token(TokenType::ASTERISK, "*".to_string()),
-        Token::new_token(TokenType::INT(5), "5".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::INT(5), "5".to_string()),
-        Token::new_token(TokenType::LESSTHAN, "<".to_string()),
-        Token::new_token(TokenType::INT(10), "10".to_string()),
-        Token::new_token(TokenType::GREATERTHAN, ">".to_string()),
-        Token::new_token(TokenType::INT(5), "5".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::IF, "if".to_string()),
-        Token::new_token(TokenType::LPAREN, "(".to_string()),
-        Token::new_token(TokenType::INT(5), "5".to_string()),
-        Token::new_token(TokenType::LESSTHAN, "<".to_string()),
-        Token::new_token(TokenType::INT(10), "10".to_string()),
-        Token::new_token(TokenType::RPAREN, ")".to_string()),
-        Token::new_token(TokenType::LBRACE, "{".to_string()),
-        Token::new_token(TokenType::RETURN, "return".to_string()),
-        Token::new_token(TokenType::TRUE, "true".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::RBRACE, "}".to_string()),
-        Token::new_token(TokenType::ELSE, "else".to_string()),
-        Token::new_token(TokenType::LBRACE, "{".to_string()),
-        Token::new_token(TokenType::RETURN, "return".to_string()),
-        Token::new_token(TokenType::FALSE, "false".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::RBRACE, "}".to_string()),
-        Token::new_token(TokenType::INT(10), "10".to_string()),
-        Token::new_token(TokenType::EQUAL, "==".to_string()),
-        Token::new_token(TokenType::INT(10), "10".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::INT(10), "10".to_string()),
-        Token::new_token(TokenType::NOTEQUAL, "!=".to_string()),
-        Token::new_token(TokenType::INT(9), "9".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::EOF, "".to_string()),
-    ];
+        let tests = [
+            Token::new_token(TokenType::LET, "let".to_string()),
+            Token::new_token(TokenType::IDENT("five".to_string()), "five".to_string()),
+            Token::new_token(TokenType::ASSIGN, "=".to_string()),
+            Token::new_token(TokenType::INT(5), "5".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::LET, "let".to_string()),
+            Token::new_token(TokenType::IDENT("ten".to_string()), "ten".to_string()),
+            Token::new_token(TokenType::ASSIGN, "=".to_string()),
+            Token::new_token(TokenType::INT(10), "10".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::LET, "let".to_string()),
+            Token::new_token(TokenType::IDENT("add".to_string()), "add".to_string()),
+            Token::new_token(TokenType::ASSIGN, "=".to_string()),
+            Token::new_token(TokenType::FUNCTION, "fn".to_string()),
+            Token::new_token(TokenType::LPAREN, "(".to_string()),
+            Token::new_token(TokenType::IDENT("x".to_string()), "x".to_string()),
+            Token::new_token(TokenType::COMMA, ",".to_string()),
+            Token::new_token(TokenType::IDENT("y".to_string()), "y".to_string()),
+            Token::new_token(TokenType::RPAREN, ")".to_string()),
+            Token::new_token(TokenType::LBRACE, "{".to_string()),
+            Token::new_token(TokenType::IDENT("x".to_string()), "x".to_string()),
+            Token::new_token(TokenType::PLUS, "+".to_string()),
+            Token::new_token(TokenType::IDENT("y".to_string()), "y".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::RBRACE, "}".to_string()),
+            Token::new_token(TokenType::LET, "let".to_string()),
+            Token::new_token(TokenType::IDENT("result".to_string()), "result".to_string()),
+            Token::new_token(TokenType::ASSIGN, "=".to_string()),
+            Token::new_token(TokenType::IDENT("add".to_string()), "add".to_string()),
+            Token::new_token(TokenType::LPAREN, "(".to_string()),
+            Token::new_token(TokenType::IDENT("five".to_string()), "five".to_string()),
+            Token::new_token(TokenType::COMMA, ",".to_string()),
+            Token::new_token(TokenType::IDENT("ten".to_string()), "ten".to_string()),
+            Token::new_token(TokenType::RPAREN, ")".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::BANG, "!".to_string()),
+            Token::new_token(TokenType::MINUS, "-".to_string()),
+            Token::new_token(TokenType::SLASH, "/".to_string()),
+            Token::new_token(TokenType::ASTERISK, "*".to_string()),
+            Token::new_token(TokenType::INT(5), "5".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::INT(5), "5".to_string()),
+            Token::new_token(TokenType::LESSTHAN, "<".to_string()),
+            Token::new_token(TokenType::INT(10), "10".to_string()),
+            Token::new_token(TokenType::GREATERTHAN, ">".to_string()),
+            Token::new_token(TokenType::INT(5), "5".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::IF, "if".to_string()),
+            Token::new_token(TokenType::LPAREN, "(".to_string()),
+            Token::new_token(TokenType::INT(5), "5".to_string()),
+            Token::new_token(TokenType::LESSTHAN, "<".to_string()),
+            Token::new_token(TokenType::INT(10), "10".to_string()),
+            Token::new_token(TokenType::RPAREN, ")".to_string()),
+            Token::new_token(TokenType::LBRACE, "{".to_string()),
+            Token::new_token(TokenType::RETURN, "return".to_string()),
+            Token::new_token(TokenType::TRUE, "true".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::RBRACE, "}".to_string()),
+            Token::new_token(TokenType::ELSE, "else".to_string()),
+            Token::new_token(TokenType::LBRACE, "{".to_string()),
+            Token::new_token(TokenType::RETURN, "return".to_string()),
+            Token::new_token(TokenType::FALSE, "false".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::RBRACE, "}".to_string()),
+            Token::new_token(TokenType::INT(10), "10".to_string()),
+            Token::new_token(TokenType::EQUAL, "==".to_string()),
+            Token::new_token(TokenType::INT(10), "10".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::INT(10), "10".to_string()),
+            Token::new_token(TokenType::NOTEQUAL, "!=".to_string()),
+            Token::new_token(TokenType::INT(9), "9".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::EOF, "".to_string()),
+        ];
 
-    for tt in tests.iter() {
-        let tok = lexer.next_token();
-        assert_eq!(tok.kind, tt.kind);
-        assert_eq!(tok.literal, tt.literal);
+        for tt in tests.iter() {
+            let tok = lexer.next_token();
+            assert_eq!(tok.kind, tt.kind);
+            assert_eq!(tok.literal, tt.literal);
+        }
     }
-}
 
-#[test]
-fn test_next_token_first() {
-    let input = "=+(){},;";
-    // let input = "=+aa(){},;";
-    let mut lexer = Lexer::new(input.to_string());
+    #[test]
+    fn test_next_token_first() {
+        let input = "=+(){},;";
+        // let input = "=+aa(){},;";
+        let mut lexer = Lexer::new(input.to_string());
 
-    let tests = [
-        Token::new_token(TokenType::ASSIGN, "=".to_string()),
-        Token::new_token(TokenType::PLUS, "+".to_string()),
-        // Token::new_token(TokenType::ILLEGAL, "a".to_string()),
-        // Token::new_token(TokenType::ILLEGAL, "a".to_string()),
-        Token::new_token(TokenType::LPAREN, "(".to_string()),
-        Token::new_token(TokenType::RPAREN, ")".to_string()),
-        Token::new_token(TokenType::LBRACE, "{".to_string()),
-        Token::new_token(TokenType::RBRACE, "}".to_string()),
-        Token::new_token(TokenType::COMMA, ",".to_string()),
-        Token::new_token(TokenType::SEMICOLON, ";".to_string()),
-        Token::new_token(TokenType::EOF, "".to_string()),
-    ];
+        let tests = [
+            Token::new_token(TokenType::ASSIGN, "=".to_string()),
+            Token::new_token(TokenType::PLUS, "+".to_string()),
+            // Token::new_token(TokenType::ILLEGAL, "a".to_string()),
+            // Token::new_token(TokenType::ILLEGAL, "a".to_string()),
+            Token::new_token(TokenType::LPAREN, "(".to_string()),
+            Token::new_token(TokenType::RPAREN, ")".to_string()),
+            Token::new_token(TokenType::LBRACE, "{".to_string()),
+            Token::new_token(TokenType::RBRACE, "}".to_string()),
+            Token::new_token(TokenType::COMMA, ",".to_string()),
+            Token::new_token(TokenType::SEMICOLON, ";".to_string()),
+            Token::new_token(TokenType::EOF, "".to_string()),
+        ];
 
-    for tt in tests.iter() {
-        let tok = lexer.next_token();
-        assert_eq!(tok.kind, tt.kind);
-        assert_eq!(tok.literal, tt.literal);
+        for tt in tests.iter() {
+            let tok = lexer.next_token();
+            assert_eq!(tok.kind, tt.kind);
+            assert_eq!(tok.literal, tt.literal);
+        }
     }
 }
