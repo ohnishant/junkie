@@ -1,57 +1,49 @@
-use crate::token;
+use crate::token::Token;
 
 pub trait Node {
-    fn token_literal(&self) -> Option<&String>;
+    fn token_literal(&self) -> &String;
 }
 
-pub trait Statement: Node {
-    fn statement_node(&self);
+#[derive(Debug)]
+pub enum Statement {
+    Let(LetStatement),
 }
 
-pub trait Expression: Node {
-    fn expression_node(&self);
+#[derive(Debug)]
+pub enum Expression {
+    Identifier(Identifier),
+    Literal(Literal),
 }
 
-// #[derive(Debug)]
+#[derive(Debug)]
 pub struct Program {
-    pub expressions: Vec<Box<dyn Statement>>,
+    pub statements: Vec<Statement>,
 }
 
-impl Node for Program {
-    fn token_literal(&self) -> Option<&String> {
-        return self.expressions.get(0)?.token_literal();
-    }
+#[derive(Debug)]
+pub struct LetStatement {
+    pub token: Token,
+    pub name: Identifier,
+    pub value: Expression,
 }
 
-// ---------- Identifier --------
-
+#[derive(Debug)]
 pub struct Identifier {
-    pub token: token::Token,
+    pub token: Token,
+    pub name: String,
+}
+
+#[derive(Debug)]
+pub struct Literal {
     pub value: String,
 }
 
-impl Expression for Identifier {
-    fn expression_node(&self) {}
-}
-impl Node for Identifier {
-    fn token_literal(&self) -> Option<&String> {
-        return Some(&self.token.literal);
-    }
-}
-
-// ---------- Let Statement --------
-
-pub struct LetStatement {
-    pub token: token::Token,
-    pub name: Identifier,
-    pub value: dyn Expression,
-}
-
-impl Statement for LetStatement {
-    fn statement_node(&self) {}
-}
-impl Node for LetStatement {
-    fn token_literal(&self) -> Option<&String> {
-        return Some(&self.token.literal);
-    }
-}
+// impl Program {
+//     pub fn token_literal(&self) -> String {
+//         if self.statements.len() > 0 {
+//             return self.statements[0].token_literal();
+//         } else {
+//             return String::from("");
+//         }
+//     }
+// }
