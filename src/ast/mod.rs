@@ -29,7 +29,6 @@ pub struct LetStatement {
 
 #[derive(Debug)]
 pub struct Identifier {
-    pub token: Token,
     pub name: String,
 }
 

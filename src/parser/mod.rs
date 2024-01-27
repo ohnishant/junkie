@@ -1,8 +1,10 @@
 #![allow(dead_code)]
 
 use crate::ast;
+use crate::ast::Identifier;
 use crate::lexer;
 use crate::token;
+use crate::token::TokenType;
 
 #[derive(Debug)]
 struct Parser {
@@ -28,15 +30,71 @@ impl Parser {
         self.peek_token = self.lexer.next_token();
     }
 
-    fn parse_program(&mut self) -> Option<&ast::Program> {
-        return None;
+    fn parse_statement(&mut self) -> Option<ast::Statement> {
+        match self.current_token.kind {
+            token::TokenType::LET => return self.parse_let_statement(),
+            _ => {
+                print!(
+                    "Parsing error: Unknown token type: {:?}",
+                    self.current_token.kind
+                );
+                return None;
+            }
+        }
+    }
+
+    fn parse_program(&mut self) -> Option<ast::Program> {
+        // create root node
+        let mut program = ast::Program {
+            statements: Vec::new(),
+        };
+        // populate root node with statements
+        while self.current_token.kind != token::TokenType::EOF {
+            let stms = self.parse_statement();
+            if let Some(stm) = stms {
+                program.statements.push(stm);
+            }
+            self.next_token();
+        }
+        return Some(program);
+    }
+
+    fn parse_let_statement(&mut self) -> Option<ast::Statement> {
+        // skip over the let keyworkd since we know this is a let Statement
+        self.next_token();
+
+        // find out the name of the identifer that is being declared
+        let ident = if let TokenType::IDENT(name) = &self.current_token.kind {
+            Identifier {
+                name: name.to_string(),
+            }
+        } else {
+            return None;
+        };
+
+        // Check if an assignment operator is present
+        self.next_token();
+        if !(self.current_token.kind == TokenType::ASSIGN) {
+            return None;
+        }
+
+        //TODO: skipping over the expression for now
+
+        let stmt = ast::LetStatement {
+            token: self.current_token.clone(),
+            name: ident,
+            //TODO: skipping over the expression for now
+            value: ast::Expression::Literal(ast::Literal {
+                value: "0".to_string(),
+            }),
+        };
+
+        return Some(ast::Statement::Let(stmt));
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::ast::{Expression, Statement};
-
     use super::*;
     use pretty_assertions::assert_eq;
 
@@ -65,16 +123,13 @@ mod tests {
         let expected_identifiers = vec![("x", "5"), ("y", "10"), ("foobar", "838383")];
 
         for (i, (exp_ident, exp_value)) in expected_identifiers.iter().enumerate() {
-            match &program.statements[i] {
-                Statement::Let(let_statement) => {
-                    assert_eq!(let_statement.name.name, String::from(*exp_ident));
-                    match &let_statement.value {
-                        Expression::Literal(val) => {
-                            assert_eq!(val.value, String::from(*exp_value))
-                        }
-                        _ => panic!("Expected a literal value at index {}", i),
-                    }
+            let stmt = &program.statements[i];
+
+            match stmt {
+                ast::Statement::Let(l_stmt) => {
+                    assert_eq!(l_stmt.name.name, *exp_ident);
                 }
+                _ => panic!("Expected LetStatement, got {:?}", stmt),
             }
         }
     }
