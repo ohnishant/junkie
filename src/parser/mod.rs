@@ -2,20 +2,21 @@
 
 use crate::ast;
 use crate::ast::Identifier;
-use crate::lexer;
+use crate::lexer::Lexer;
 use crate::token;
 use crate::token::TokenType;
 
 #[derive(Debug)]
 struct Parser {
-    lexer: lexer::Lexer,
+    lexer: Lexer,
 
     current_token: token::Token,
     peek_token: token::Token,
+    errors: Vec<String>,
 }
 
 impl Parser {
-    pub fn new(mut lexer: lexer::Lexer) -> Parser {
+    pub fn new(mut lexer: Lexer) -> Parser {
         let current_token = lexer.next_token();
         let peek_token = lexer.next_token();
 
@@ -23,22 +24,25 @@ impl Parser {
             lexer,
             current_token,
             peek_token,
+            errors: Vec::new(),
         };
     }
+
     fn next_token(&mut self) {
         self.current_token = std::mem::replace(&mut self.peek_token, self.lexer.next_token());
     }
 
-    fn parse_statement(&mut self) -> Option<ast::Statement> {
-        match self.current_token.kind {
-            token::TokenType::LET => return self.parse_let_statement(),
-            _ => {
-                print!(
-                    "Parsing error: Unknown token type: {:?}",
-                    self.current_token.kind
-                );
-                return None;
-            }
+    fn errors(&self) -> Vec<String> {
+        // TODO: do this without cloning
+        return self.errors.clone();
+    }
+
+    fn expect_peek(&mut self, kind: TokenType) -> bool {
+        if self.peek_token.kind == kind {
+            self.next_token();
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -49,15 +53,32 @@ impl Parser {
         };
         // populate root node with statements
         while self.current_token.kind != token::TokenType::EOF {
-            let stms = self.parse_statement();
-            if let Some(stm) = stms {
+            if let Some(stm) = self.parse_statement() {
                 program.statements.push(stm);
             }
+            // jumps over the semicolon
             self.next_token();
         }
         return Some(program);
     }
 
+    fn parse_statement(&mut self) -> Option<ast::Statement> {
+        match self.current_token.kind {
+            token::TokenType::LET => return self.parse_let_statement(),
+            _ => {
+                println!(
+                    "[WARN]: Parsing error: Unknown token type: {:?}",
+                    self.current_token.kind
+                );
+                return None;
+            }
+        }
+    }
+
+    /// Parses a let statement and returns a Statement node
+    /// The current token should be the LET keyword
+    /// Leaves the parser with the current token as the SEMICOLON
+    /// make sure to call next_token() after this function
     fn parse_let_statement(&mut self) -> Option<ast::Statement> {
         // skip over the let keyworkd since we know this is a let Statement
         self.next_token();
@@ -77,8 +98,6 @@ impl Parser {
             return None;
         }
 
-        //TODO: skipping over the expression for now
-
         let stmt = ast::LetStatement {
             token: self.current_token.clone(),
             name: ident,
@@ -88,6 +107,14 @@ impl Parser {
             }),
         };
 
+        while self.current_token.kind != TokenType::SEMICOLON {
+            self.next_token();
+        }
+
+        //println!("[INFO]: Current Token: {:?}", self.current_token);
+        //println!("[INFO]: Peek Token: {:?}", self.peek_token);
+
+        println!("[INFO]: Let Statement: {:?}", stmt);
         return Some(ast::Statement::Let(stmt));
     }
 }
@@ -99,13 +126,12 @@ mod tests {
 
     #[test]
     fn test_let_statements() {
-        let input = r#"
-        let x = 5;
+        let input = r#"let x = 5;
         let y = 10;
         let foobar = 838383;
         "#;
 
-        let lexer = lexer::Lexer::new(input.to_string());
+        let lexer = Lexer::new(input.to_string());
         let mut parser = Parser::new(lexer);
 
         let program = parser.parse_program();
