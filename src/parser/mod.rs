@@ -38,7 +38,7 @@ impl Parser {
     }
 
     fn expect_peek(&mut self, kind: TokenType) -> bool {
-        if self.peek_token.kind == kind {
+        if TokenType::variant_eq(&self.peek_token.kind, &kind) {
             self.next_token();
             return true;
         } else {
@@ -77,29 +77,24 @@ impl Parser {
 
     /// Parses a let statement and returns a Statement node
     /// The current token should be the LET keyword
+    ///
     /// Leaves the parser with the current token as the SEMICOLON
     /// make sure to call next_token() after this function
     fn parse_let_statement(&mut self) -> Option<ast::Statement> {
-        // skip over the let keyworkd since we know this is a let Statement
-        self.next_token();
+        let let_token = self.current_token.clone();
 
-        // find out the name of the identifer that is being declared
-        let ident = if let TokenType::IDENT(name) = &self.current_token.kind {
-            Identifier {
-                name: name.to_string(),
-            }
-        } else {
-            return None;
+        self.expect_peek(TokenType::IDENT("".to_string()));
+
+        let ident = Identifier {
+            name: self.current_token.literal.clone(),
         };
 
-        // Check if an assignment operator is present
-        self.next_token();
-        if !(self.current_token.kind == TokenType::ASSIGN) {
+        if !self.expect_peek(TokenType::ASSIGN) {
             return None;
         }
 
         let stmt = ast::LetStatement {
-            token: self.current_token.clone(),
+            token: let_token,
             name: ident,
             //TODO: skipping over the expression for now
             value: ast::Expression::Literal(ast::Literal {
@@ -114,7 +109,7 @@ impl Parser {
         //println!("[INFO]: Current Token: {:?}", self.current_token);
         //println!("[INFO]: Peek Token: {:?}", self.peek_token);
 
-        println!("[INFO]: Let Statement: {:?}", stmt);
+        //println!("[INFO]: Let Statement: {:?}", stmt);
         return Some(ast::Statement::Let(stmt));
     }
 }

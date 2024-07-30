@@ -36,6 +36,17 @@ pub enum TokenType {
     RETURN,
 }
 
+impl TokenType {
+    pub fn variant_eq(&self, other: &Self) -> bool {
+        use TokenType::*;
+        match (self, other) {
+            (IDENT(_), IDENT(_)) => true,
+            (INT(_), INT(_)) => true,
+            _ => self == other,
+        }
+    }
+}
+
 #[derive(PartialEq, Debug, Clone)]
 pub struct Token {
     pub kind: TokenType,
