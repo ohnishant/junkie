@@ -32,9 +32,17 @@ impl Parser {
         self.current_token = std::mem::replace(&mut self.peek_token, self.lexer.next_token());
     }
 
-    fn errors(&self) -> Vec<String> {
+    pub fn errors(&self) -> Vec<String> {
         // TODO: do this without cloning
         return self.errors.clone();
+    }
+
+    fn peek_error(&mut self, kind: TokenType) {
+        let msg = format!(
+            "Expected next token to be {:?}, got {:?} instead",
+            kind, self.peek_token.kind
+        );
+        self.errors.push(msg);
     }
 
     fn expect_peek(&mut self, kind: TokenType) -> bool {
@@ -42,6 +50,7 @@ impl Parser {
             self.next_token();
             return true;
         } else {
+            self.peek_error(kind);
             return false;
         }
     }
@@ -131,6 +140,13 @@ mod tests {
 
         let program = parser.parse_program();
         assert!(program.is_some(), "Parsing error: Program is has no nodes");
+
+        assert!(
+            parser.errors().is_empty(),
+            "Parser has {} errors:\n\t{}",
+            parser.errors().len(),
+            parser.errors().join("\n\t")
+        );
 
         let program = program.unwrap();
         assert_eq!(
