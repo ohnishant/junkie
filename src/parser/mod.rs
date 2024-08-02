@@ -74,6 +74,7 @@ impl Parser {
     fn parse_statement(&mut self) -> Option<ast::Statement> {
         match self.current_token.kind {
             token::TokenType::LET => return self.parse_let_statement(),
+            token::TokenType::RETURN => return self.parse_return_statement(),
             _ => {
                 println!(
                     "[WARN]: Parsing error: Unknown token type: {:?}",
@@ -121,6 +122,25 @@ impl Parser {
         //println!("[INFO]: Let Statement: {:?}", stmt);
         return Some(ast::Statement::Let(stmt));
     }
+
+    fn parse_return_statement(&mut self) -> Option<ast::Statement> {
+        let return_token = self.current_token.clone();
+
+        self.next_token();
+        // TODO: skipping over the expression for now
+        while !TokenType::variant_eq(&self.current_token.kind, &TokenType::SEMICOLON) {
+            self.next_token();
+        }
+
+        let stmt = ast::ReturnStatement {
+            token: return_token,
+            return_value: ast::Expression::Literal(ast::Literal {
+                value: "0".to_string(),
+            }),
+        };
+
+        return Some(ast::Statement::Return(stmt));
+    }
 }
 
 #[cfg(test)]
@@ -166,6 +186,51 @@ mod tests {
                     assert_eq!(l_stmt.name.name, *exp_ident);
                 }
                 _ => panic!("Expected LetStatement, got {:?}", stmt),
+            }
+        }
+    }
+
+    #[test]
+    fn test_return_statements() {
+        let input = r#"return 5;
+        return 10;
+        return 993322;
+        "#;
+
+        let lexer = Lexer::new(input.to_string());
+        let mut parser = Parser::new(lexer);
+
+        let program = parser.parse_program();
+        assert!(program.is_some(), "Parsing error: Program is has no nodes");
+
+        assert!(
+            parser.errors().is_empty(),
+            "Parser has {} errors:\n\t{}",
+            parser.errors().len(),
+            parser.errors().join("\n\t")
+        );
+
+        let program = program.unwrap();
+        assert_eq!(
+            program.statements.len(),
+            3,
+            "Found {} statements, expected 3",
+            program.statements.len()
+        );
+
+        for (i, statement) in program.statements.iter().enumerate() {
+            match statement {
+                ast::Statement::Return(stmt) => {
+                    assert_eq!(
+                        stmt.token.kind,
+                        TokenType::RETURN,
+                        "Expected Return token, got {:?}",
+                        stmt.token.kind
+                    );
+                }
+                _ => {
+                    panic!("Expected ReturnStatement, got {:?}", statement);
+                }
             }
         }
     }
